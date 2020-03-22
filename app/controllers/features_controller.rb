@@ -9,6 +9,7 @@ class FeaturesController < ApplicationController
   end
 
   # Top-5 игроков по конкретному показателю в конкретной команде
+  # GET /features/:id/top_btw_gamers/:team_id
   def top_btw_gamers
     gamers = Gamer.where({team_id: params[:team_id]}).pluck(:id)
     top_features = @feature.tags.includes(:gamer).group(["feature_id", "gamer_id"]).where({gamer_id: gamers}).order(count_id: :desc).limit(5)
@@ -16,6 +17,7 @@ class FeaturesController < ApplicationController
   end
 
   # Top-5 игроков по конкретному показателю по всем командам в целом
+  # GET /features/:id/top_btw_teams
   def top_btw_teams
     top_features = @feature.tags.includes(:gamer).group(["feature_id", "gamer_id"]).order(count_id: :desc).limit(5)
     render json: top_features, status: :ok

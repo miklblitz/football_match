@@ -8,8 +8,9 @@ class GamersController < ApplicationController
     render json: @gamers
   end
   
+  # проверка, что игрок выполнил такой-то показатель в матче
+  # GET /gamers/:id/done_feature/:feature_id/in_match/:match_id
   def done_feature
-    # проверка, что игрок выполнил такой-то показатель в матче
     has_feature =  @gamer.tags.where({match_id: params[:match_id], feature_id: params[:feature_id]})
     if has_feature.present?
       render json: has_feature
@@ -18,8 +19,9 @@ class GamersController < ApplicationController
     end
   end
   
+  # проверка, что игрок выполнил такой-то показатель в последних 5 матчах
+  # GET /gamers/:id/feature_for_last_five
   def feature_for_last_five
-    # проверка, что игрок выполнил такой-то показатель в последних 5 матчах
     match_ids = Match.order(created_at: :desc).limit(5).pluck(:id)
 
     has_feature =  @gamer.tags.where({match_id: match_ids})
