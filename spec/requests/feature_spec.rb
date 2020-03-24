@@ -17,10 +17,8 @@ RSpec.describe 'Feature API tests', type: :request do
     }
 
     it 'Top-5 игроков по конкретному показателю в конкретной команде' do
-      features = Tag.all.order(id: :desc).select(:feature_id).order(match_id: :desc).pluck(:feature_id).uniq # уник. фичи которые задействованы
-      gamers_ids = Gamer.where({team_id: teamone.id}).pluck(:id)
-      feature = Feature.find(features.sample)
-      tops = feature.tags.includes(:gamer).group(["gamer_id"]).where({gamer_id: gamers_ids}).order(count_all: :desc).limit(Gamer::TOPS).count
+      feature = Feature.find(feature_list.sample.id)
+      tops = feature.top_five_in_teams(Gamer::for_team(teamone))
 
       get feature_top_btw_gamers_feature_path(feature.id, teamone.id)
       
@@ -45,10 +43,9 @@ RSpec.describe 'Feature API tests', type: :request do
     }
 
     it 'Top-5 игроков по конкретному показателю по всем командам в целом' do
-      features = Tag.all.order(id: :desc).select(:feature_id).order(match_id: :desc).pluck(:feature_id).uniq # уник. фичи которые задействованы
-      feature = Feature.find(features.sample)
-      tops = feature.tags.includes(:gamer).group(["gamer_id"]).order(count_all: :desc).limit(Gamer::TOPS).count
-
+      feature = Feature.find(feature_list.sample.id)
+      tops = feature.top_five_btw_teams
+      
       get top_btw_teams_feature_path(feature.id)
 
       resp = JSON.parse response.body

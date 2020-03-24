@@ -16,4 +16,7 @@ class Gamer < ApplicationRecord
     tags.where({match_id: match_ids, feature_id: feature_id})
   end
 
+  def self.for_team(team_id) 
+    where({team_id: team_id}).pluck(:id)
+  end
 end
