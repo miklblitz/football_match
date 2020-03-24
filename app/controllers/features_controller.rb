@@ -11,16 +11,22 @@ class FeaturesController < ApplicationController
   # Top-5 игроков по конкретному показателю в конкретной команде
   # GET /features/:id/top_btw_gamers/:team_id
   def top_btw_gamers
-    gamers = Gamer.where({team_id: params[:team_id]}).pluck(:id)
-    top_features = @feature.tags.includes(:gamer).group(["feature_id", "gamer_id"]).where({gamer_id: gamers}).order(count_id: :desc).limit(5)
-    render json: top_features, status: :ok
+    gamers_ids = Gamer.where({team_id: params[:team_id]}).pluck(:id)
+    tops = @feature.tags.includes(:gamer).group(["gamer_id"]).where({gamer_id: gamers_ids}).order(count_all: :desc).limit(Gamer::TOPS).count
+    gamers = Gamer.find(tops.keys)
+    counts = tops.values
+
+    render json: FeatureTopGamersPresenter.new(gamers: gamers || [], counts: counts)
   end
 
   # Top-5 игроков по конкретному показателю по всем командам в целом
   # GET /features/:id/top_btw_teams
   def top_btw_teams
-    top_features = @feature.tags.includes(:gamer).group(["feature_id", "gamer_id"]).order(count_id: :desc).limit(5)
-    render json: top_features, status: :ok
+    tops = @feature.tags.includes(:gamer).group(["gamer_id"]).order(count_all: :desc).limit(Gamer::TOPS).count
+    gamers = Gamer.find(tops.keys)
+    counts = tops.values
+
+    render json: FeatureTopTeamGamersPresenter.new(gamers: gamers || [], counts: counts)
   end
 
   # GET /features/1

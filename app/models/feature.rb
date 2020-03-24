@@ -1,5 +1,6 @@
 class Feature < ApplicationRecord
   has_many :tags
   has_many :gamers, through: :tags
+  
+  validates_presence_of :name
 end
-# Tag.group(["feature_id", "gamer_id"]).where(feature_id: 2).order(count_id: :desc).limit(5).count(:id)
